@@ -1,0 +1,39 @@
+{
+    "technical": [
+        {
+            "name": "javascript"
+        },
+        {
+            "name": "php"
+        },
+        {
+            "name": "python"
+        },
+        {
+            "name": "java"
+        }
+    ],
+    "general":[
+        {
+            "name":"Backend"
+        },
+        {
+            "name":"Frontend"
+        }
+        ,
+        {
+            "name":"Seguridad"
+        }
+        ,
+        {
+            "name":"Servidores"
+        },
+        {
+            "name": "Analisis de redes"
+        }
+        ,
+        {
+            "name": "Ingles"
+        }
+    ]
+}
