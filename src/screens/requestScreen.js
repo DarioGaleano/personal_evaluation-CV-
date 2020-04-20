@@ -11,35 +11,127 @@ import countries from '../helpers/countries.json'
 import states from '../helpers/states.json'
 import cities from '../helpers/cities.json'
 import knowledges from '../helpers/knowledge.json'
-
+import Toast from '../components/Toast'
+import ButtonSpinner from '../components/ButtonSpinner'
+import FormValidator from '../helpers/form-validator'
 const genders = [
-    { name: "Masculino" },
-    { name: "Femenino" }
+    { name: "Masculino", id:1 },
+    { name: "Femenino", id:2 },
+    { name: "Ambos", id:3 },
+    
 ]
 const academicLevels = [
-    { name: "Bachiller" },
-    { name: "Tecnico" },
-    { name: "Universitario" }
-]
+    { name: "Bachiller", id:1 },
+    { name: "Tecnico", id:2 },
+    { name: "Universitario", id:3 }
+]/*
 const specializations = [
-    { name: "Ninguna" },
-    { name: "Maestria" },
-    { name: "Postgrado" },
-    { name: "Doctorado" }
-]
+    { name: "Ninguna", id:1 },
+    { name: "Maestria", id:2 },
+    { name: "Postgrado", id:3 },
+    { name: "Doctorado", id:4 }
+]*/
 const expYears = [
-    { name: "Sin experiencia" },
-    { name: "Menos de 1" },
-    { name: "1" },
-    { name: "2" },
-    { name: "3" },
-    { name: "4" },
-    { name: "5+" },
-    { name: "10+" }
+    { name: "Sin experiencia", id:1 },
+    { name: "Menos de 1",id:2 },
+    { name: "1", id:3 },
+    { name: "2", id:4 },
+    { name: "3", id:5 },
+    { name: "4", id:6 },
+    { name: "5+", id:7 },
+    { name: "10+",id:8 }
 ]
 
 
 export default function RequestScreen() {
+
+    const validator = new FormValidator([
+        {
+            field: "minAge",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Debe un minimo para la edad"
+        },
+        { 
+            field: 'minAge', 
+            method: 'isNumeric', 
+            validWhen: true, 
+            message: 'Debe ingresar solo numeros' 
+        },
+        {
+          field: "maxAge",
+          method: "isEmpty",
+          validWhen: false,
+          message: "Debe ingresar un maximo para la edad"
+        },
+        {
+          field: "maxAge",
+          method: "isNumeric",
+          validWhen: true,
+          message: "Debe ingresar solo numeros"
+        },
+        {
+            field: "gender",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Debe seleccionar un genero"
+        },
+        {
+            field: "countrie",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Seleccione pais de nacimiento"
+        },
+        {
+            field: "state",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Seleccione tipo de documento"
+        },
+        {
+            field: "city",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Ingrese numero de documento"
+        },
+        {
+            field: "academicLevel",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Seleccione pais del documento"
+        },
+        {
+            field: "years",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Seleccione pais del documento"
+        },
+        {
+            field: "salaryMin",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Debe ingresar un monto minimo"
+        },
+        {
+            field: "salaryMin",
+            method: "isNumeric",
+            validWhen: true,
+            message: "Debe ingresar un monto"
+        },
+        {
+            field: "salaryMax",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Debe ingresar un monto maximo"
+        },
+        {
+            field: "salaryMax",
+            method: "isNumeric",
+            validWhen: true,
+            message: "Debe ingresar un monto"
+        }
+      ]);
+
     const classes = useStyles();
     const [minAge, setMinAge] = useState('')
     const [maxAge, setMaxAge] = useState('')
@@ -47,16 +139,32 @@ export default function RequestScreen() {
     const [countrie, setCountrie] = useState('')
     const [state, setState]=useState('')
     const [city, setCity]=useState('')
+    const [academicLevel, setAcademicLevel] = useState('')
+    const [years, setYears] = useState('')
+    const [salaryMin, setSalaryMin] = useState('')
+    const [salaryMax, setSalaryMax] = useState('')
+
+    const [minAgeError, setMinAgeError] = useState('')
+    const [maxAgeError, setMaxAgeError] = useState('')
+    const [genderError, setGenderError] = useState('')
+    const [countrieError, setCountrieError]=useState('')
+    const [stateError, setStateError]=useState('')
+    const [cityError, setCityError]=useState('')
+    const [academicLevelError, setAcademicLevelError]=useState('')
+    const [yearsError, setYearsError]=useState('')
+    const [salaryMinError, setSalaryMinError] = useState('')
+    const [salaryMaxError, setSalaryMaxError] = useState('')
+
+
     const [newCities, setNewCities] = useState([])
     const [newStates, setNewtates] = useState([])
     const [labelWidth, setLabelWidth] = useState(0);
-    const [academicLevel, setAcademicLevel] = useState('')
-    const [salaryMin, setSalaryMin] = useState('')
-    const [salaryMax, setSalaryMax] = useState('')
-    const [years, setYears] = useState('')
+   
     const [checkedTecnicalKnowledges, setTecnicalKnowledges] = useState([])
     const [checkedGeneralKnowledges, setGeneralKnowledges] = useState([])
-
+    const [loading,setLoading]=useState(false)
+    const [toast,setToast] = useState(false)
+    const [toastMessage,setToastMessage] = useState('')
 
     const handleChangeTecnicalKnowledges =async (event) => {
         // updating an object instead of a Map
@@ -102,24 +210,81 @@ export default function RequestScreen() {
     useEffect(() => {
         setLabelWidth(inputLabel.current.offsetWidth);
     }, []);
+
+    const onSubmit=async ()=>{
+        let validation = validator.validate({
+            minAge,
+            maxAge,
+            gender,
+            countrie,
+            state,
+            city,
+            academicLevel,
+            years,
+            salaryMin,
+            salaryMax
+        });
+        setMinAgeError(validation.minAge.message)
+        setMaxAgeError(validation.maxAge.message)
+        setGenderError(validation.gender.message)
+        setCountrieError(validation.countrie.message)
+        setStateError(validation.state.message)
+        setCityError(validation.city.message)
+        setAcademicLevelError(validation.academicLevel.message)
+        setYearsError(validation.years.message)
+        setSalaryMinError(validation.salaryMin.message)
+        setSalaryMaxError(validation.salaryMax.message)
+        
+        setLoading(true)
+
+        if(validation.isValid){
+            let workExperience={
+                "years":years
+            }
+            let countrieAux=data.find(countries=> countries.id===countrie)                
+            let stateAux=newStates.find(states=> states.id===state)
+            let request={
+                "personalData":{
+                    "minAge":minAge,
+                    "maxAge":maxAge,
+                    "gender":gender,
+                    "countrie":countrieAux.name,
+                    "state":stateAux.name,
+                    "city":city
+                },
+                "academicLevel":academicLevel,
+                "workExperience":workExperience,
+                "tecnicalKnowledges":checkedTecnicalKnowledges,
+                "generalKnowledges":checkedGeneralKnowledges,
+            }
+            
+            console.log("request", JSON.stringify(request))
+
+        }
+        setLoading(false)
+    }
     return (
         <div className={classes.container}>
-            <Grid lg={12} className={classes.header}>
+            <Toast message={toastMessage} open={toast} close={()=>{setToast(false);}}/>
+            <Grid item lg={12} className={classes.header}>
                 <h2 className={classes.title}>Requerimiento</h2>
             </Grid>
             <Container maxWidth="lg" className={classes.containerChild} >
                 <CssBaseline />
-                <Grid lg={3} direction='column' className={classes.grid}>
+                <Grid item lg={3} className={classes.grid}>
                     <h2 className={classes.title}>Perfil Personal</h2>
                     <TextField
                         variant="outlined"
                         margin="normal"
                         required
                         fullWidth
-                        id="name"
+                        id="minAge"
                         label="Edad minima"
-                        name="name"
-                        autoComplete="name"
+                        inputProps={{maxLength: 2}}
+                        helperText={minAgeError}
+                        error={minAgeError!==""}
+                        name="minAge"
+                        autoComplete="minAge"
                         value={minAge}
                         onChange={(e) => setMinAge(e.target.value)}
                     />
@@ -128,16 +293,19 @@ export default function RequestScreen() {
                         margin="normal"
                         required
                         fullWidth
-                        id="lastname"
+                        inputProps={{maxLength: 2}}
+                        helperText={maxAgeError}
+                        error={maxAgeError!==""}
+                        id="maxAge"
                         label="Edad Maxima"
-                        name="lastname"
-                        autoComplete="lastname"
+                        name="maxAge"
+                        autoComplete="maxAge"
                         value={maxAge}
                         onChange={(e) => setMaxAge(e.target.value)}
                     />
                     <FormControl variant="outlined" margin="normal" fullWidth>
                         <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
-                            Gender
+                            Genero
                     </InputLabel>
                         <Select
                             labelId="demo-simple-select-outlined-label"
@@ -146,7 +314,8 @@ export default function RequestScreen() {
                             onChange={e => setGender(e.target.value)}
                             labelWidth={labelWidth}
                             fullWidth
-
+                            helperText={genderError}
+                            error={genderError!==""}
                         >
                             {
                                 genders.map(gender => (<MenuItem key={gender.name} value={gender.name}>{gender.name}</MenuItem>))
@@ -159,14 +328,15 @@ export default function RequestScreen() {
                             Pais de residencia
                         </InputLabel>
                         <Select
-                            value={countrie.name}
+                            value={countrie}
                             onChange={handleCountrieChnage}
                             labelWidth={labelWidth}
                             fullWidth
-                        
+                            helperText={countrieError}
+                            error={countrieError!==""}
                         >
                             {
-                                data.map(countries => (<MenuItem id={countries.id} value={countries.id}>{countries.name}</MenuItem>))
+                                data.map(countries => (<MenuItem key ={countries.id} value={countries.id}>{countries.name}</MenuItem>))
                             }
                         </Select>
                     </FormControl>
@@ -181,9 +351,11 @@ export default function RequestScreen() {
                                 onChange={handleStateChnage}
                                 labelWidth={labelWidth}
                                 fullWidth
+                                helperText={stateError}
+                                error={stateError!==""}
                             >
                             {
-                                newStates.map(item => (<MenuItem id={item.id} value={item.id}>
+                                newStates.map(item => (<MenuItem key={item.id} value={item.id}>
                                 {
                                     item.name
                                 }
@@ -204,9 +376,11 @@ export default function RequestScreen() {
                                 onChange={e => setCity(e.target.value)}
                                 labelWidth={labelWidth}
                                 fullWidth
+                                helperText={cityError}
+                                error={cityError!==""}
                             >
                             {
-                                newCities.map(item => (<MenuItem key={item.name} value={item.name}>
+                                newCities.map(item => (<MenuItem key={item.id} value={item.name}>
                                 {
                                         item.name
                                 }
@@ -217,7 +391,7 @@ export default function RequestScreen() {
                         :null
                     }
                 </Grid>
-                <Grid lg={3} direction='column' className={classes.grid}>
+                <Grid item lg={3} className={classes.grid}>
                     <h2 className={classes.title}>Formación Academica</h2>
                     <FormControl variant="outlined" margin="normal" fullWidth>
                         <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
@@ -230,9 +404,11 @@ export default function RequestScreen() {
                             onChange={e => setAcademicLevel(e.target.value)}
                             labelWidth={labelWidth}
                             fullWidth
+                            helperText={academicLevelError}
+                            error={academicLevelError!==""}
                         >
                             {
-                                academicLevels.map(level => (<MenuItem key={level.name} value={level.name}>{level.name}</MenuItem>))
+                                academicLevels.map(level => (<MenuItem key={level.id} value={level.name}>{level.name}</MenuItem>))
                             }
                         </Select>
                     </FormControl>
@@ -250,14 +426,16 @@ export default function RequestScreen() {
                             onChange={e => setYears(e.target.value)}
                             labelWidth={labelWidth}
                             fullWidth
+                            helperText={yearsError}
+                            error={yearsError!==""}
                         >
                             {
-                                expYears.map(year => (<MenuItem value={year.name}>{year.name}</MenuItem>))
+                                expYears.map(year => (<MenuItem key={year.id} value={year.name}>{year.name}</MenuItem>))
                             }
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid lg={3} direction='row' className={classes.grid}>
+                <Grid item lg={3}  className={classes.grid}>
                     <h2 className={classes.title}>Conocimientos tecnicos</h2>
                     {
                         knowledges.technical.map(knowledge => (
@@ -298,17 +476,20 @@ export default function RequestScreen() {
                         ))
                     }
                 </Grid>
-                <Grid lg={3} direction='column' className={classes.grid}>
+                <Grid item lg={3} className={classes.grid}>
                     <h2 className={classes.title}>Salario</h2>
                     <TextField
                         variant="outlined"
                         margin="normal"
                         required
                         fullWidth
-                        id="salary"
+                        id="salaryMin"
                         label="Salario minimo(Divisa dolar)"
                         name="salary"
                         autoComplete="salary"
+                        helperText={salaryMinError}
+                        error={salaryMinError!==""}
+                        inputProps={{maxLength: 5}}
                         autoFocus
                         value={salaryMin}
                         onChange={(e) => setSalaryMin(e.target.value)}
@@ -318,16 +499,27 @@ export default function RequestScreen() {
                         margin="normal"
                         required
                         fullWidth
-                        id="salary"
+                        id="salaryMax"
                         label="Salario maximo(Divisa dolar)"
                         name="salary"
                         autoComplete="salary"
+                        helperText={salaryMaxError}
+                        error={salaryMaxError!==""}
+                        inputProps={{maxLength: 5}}
                         autoFocus
                         value={salaryMax}
                         onChange={(e) => setSalaryMax(e.target.value)}
                     />
                 </Grid>
             </Container>
+            <Grid item lg={8}  className={classes.grid}>
+                <ButtonSpinner 
+                    fullWidth
+                    action={onSubmit}
+                    loading={loading}
+                    text="Continuar"
+                />
+            </Grid>
         </div>
     )
 }
@@ -335,7 +527,11 @@ export default function RequestScreen() {
 
 const useStyles = makeStyles({
     container:{
-        backgroundColor:'powderblue'
+        backgroundColor:'powderblue',
+        display:'flex',
+        alignItems:'center',
+        flexDirection: 'column',
+        height:1000+'px'
     },
     containerChild: {
         flexDirection: "row",
@@ -349,7 +545,6 @@ const useStyles = makeStyles({
         display:'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth:10+'px',
         borderColor: 'gray' 
     },
     title: {

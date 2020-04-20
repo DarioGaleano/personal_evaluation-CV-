@@ -13,64 +13,168 @@ import cities from '../helpers/cities.json'
 import knowledges from '../helpers/knowledge.json'
 import Toast from '../components/Toast'
 import ButtonSpinner from '../components/ButtonSpinner'
-
+import FormValidator from '../helpers/form-validator'
 const genders = [
-    { name: "Masculino" },
-    { name: "Femenino" }
+    { name: "Masculino", id:1 },
+    { name: "Femenino", id:2 }
 ]
 const academicLevels = [
-    { name: "Bachiller" },
-    { name: "Tecnico" },
-    { name: "Universitario" }
+    { name: "Bachiller", id:1 },
+    { name: "Tecnico", id:2 },
+    { name: "Universitario", id:3 }
 ]
 const specializations = [
-    { name: "Ninguna" },
-    { name: "Maestria" },
-    { name: "Postgrado" },
-    { name: "Doctorado" }
+    { name: "Ninguna", id:1 },
+    { name: "Maestria", id:2 },
+    { name: "Postgrado", id:3 },
+    { name: "Doctorado", id:4 }
 ]
 const expYears = [
-    { name: "Sin experiencia" },
-    { name: "Menos de 1" },
-    { name: "1" },
-    { name: "2" },
-    { name: "3" },
-    { name: "4" },
-    { name: "5+" },
-    { name: "10+" }
+    { name: "Sin experiencia", id:1 },
+    { name: "Menos de 1",id:2 },
+    { name: "1", id:3 },
+    { name: "2", id:4 },
+    { name: "3", id:5 },
+    { name: "4", id:6 },
+    { name: "5+", id:7 },
+    { name: "10+",id:8 }
 ]
 
 
 export default function FormScreen() {
+    const validator = new FormValidator([
+        {
+            field: "email",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Debe ingresar email"
+        },
+        { 
+            field: 'email', 
+            method: 'isEmail', 
+            validWhen: true, 
+            message: 'Ingrese un correo electrónico valido' 
+        },
+        {
+          field: "name",
+          method: "isEmpty",
+          validWhen: false,
+          message: "Debe ingresar nombre del pasajero"
+        },
+        {
+          field: "lastName",
+          method: "isEmpty",
+          validWhen: false,
+          message: "Debe ingresar apellido del pasajero"
+        },
+        {
+            field: "gender",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Debe seleccionar un genero"
+        },
+        {
+            field: "birthDay",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Debe seleccionar una fecha de nacimiento"
+        },
+        {
+            field: "countrie",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Seleccione pais de nacimiento"
+        },
+        {
+            field: "state",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Seleccione tipo de documento"
+        },
+        {
+            field: "city",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Ingrese numero de documento"
+        },
+        {
+            field: "academicLevel",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Seleccione pais del documento"
+        },
+        {
+            field: "years",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Seleccione pais del documento"
+        },
+        {
+            field: "salary",
+            method: "isEmpty",
+            validWhen: false,
+            message: "Ingrese aspiracion salarial"
+        },
+        {
+            field: "salary",
+            method: "isNumeric",
+            validWhen: true,
+            message: "Debe ingresar un monto"
+        }
+      ]);
     const classes = useStyles();
     const [loading, setLoading] = useState(false)
+    const [labelWidth, setLabelWidth] = useState(0);
+    const [newCities, setNewCities] = useState([])
+    const [newStates, setNewtates] = useState([])
+
     const [email, setEmail] = useState('')
-    const [validEmail, setValidEmail]=useState(false)
     const [name, setName] = useState('')
     const [lastName, setLastName] = useState('')
     const [gender, setGender] = useState('')
+    const [birthDay,  setBirthDay] = useState('')
     const [countrie, setCountrie] = useState('')
     const [state, setState]=useState('')
     const [city, setCity]=useState('')
-    const [newCities, setNewCities] = useState([])
-    const [newStates, setNewtates] = useState([])
-    const [labelWidth, setLabelWidth] = useState(0);
-    const [date, setDate] = useState('')
+    
     const [academicLevel, setAcademicLevel] = useState('')
     const [university, setUniversity] = useState('')
-    const [specializationUniversity, setSpecializationUniversity] = useState('')
-    const [specializationLevel, setSpecializationLevel] = useState('')
-    const [salary, setSalary] = useState('')
     const [title, setTitle] = useState('')
+    const [specializationLevel, setSpecializationLevel] = useState('')
+    const [specializationUniversity, setSpecializationUniversity] = useState('')
     const [specializationTitle, setSpecializationTitle] = useState('')
+
     const [years, setYears] = useState('')
     const [company, setCompany] = useState('')
     const [job, setJob] = useState('')
+
+    const [salary, setSalary] = useState('')
+    
     const [checkedTecnicalKnowledges, setTecnicalKnowledges] = useState([])
     const [checkedGeneralKnowledges, setGeneralKnowledges] = useState([])
     const [toast,setToast] = useState(false)
     const [toastMessage,setToastMessage] = useState('')
-    
+
+    const [emailError, setEmailError]=useState('')
+    const [nameError, setNameError]=useState('')
+    const [lastNameError, setLastNameError]=useState('')
+    const [genderError, setGenderError]=useState('')
+    const [birthDayError, setBirthDayError]=useState('')
+    const [countrieError, setCountrieError]=useState('')
+    const [stateError, setStateError]=useState('')
+    const [cityError, setCityError]=useState('')
+    const [academicLevelError, setAcademicLevelError]=useState('')
+    const [universityError, setUniversityError]=useState('')
+    const [titleError, setTitleError]=useState('')
+    const [specializationLevelError, setSpecializationLevelError]=useState('')
+    const [specializationUniversityError, setSpecializationUniversityError]=useState('')
+    const [specializationTitleError, setSpecializationTitleError]=useState('')
+    const [yearsError, setYearsError]=useState('')
+    const [companyError, setCompanyError]=useState('')
+    const [jobError, setJobError]=useState('')
+    const [salaryError, setSalaryError]=useState('')
+
+
     useEffect(() => {setLabelWidth(inputLabel.current.offsetWidth)}, []);
 
     const handleChangeTecnicalKnowledges =async (event) => { 
@@ -80,7 +184,9 @@ export default function FormScreen() {
        await setGeneralKnowledges({...checkedGeneralKnowledges, [event.target.value]: event.target.checked});
     }
     const handleCountrieChnage= async (e)=>{
+        
         await setCountrie(e.target.value)
+        
         let aux=[]
         states.states.forEach(element => {
             if(element.id_country===e.target.value)  {
@@ -100,130 +206,138 @@ export default function FormScreen() {
     }
     const data = countries.countries;
     const inputLabel = useRef(null);
-    const validateEmail= ()=> {
-        if (email !== "") {
-          let pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          return pattern.test(String(email).toLowerCase());
-        } else {
-          //this.ref.focus();
-          return true;
-        }
-      }
-    const handleOnBlurEmail = async () => {
-        if (!validateEmail()) {
-          await setValidEmail(true)
-        }
-        else await setValidEmail(false)
+    const sendData =()=>{
 
-      };
-    const validate=()=>{
-        console.log("years",years)
-        if(email===''){   
-            setToast(true)
-            setToastMessage('Debe ingresar un correo electronico')
-            return false;
-        }
-        if(validEmail){   
-            setToast(true)
-            setToastMessage('Debe ingresar un correo electronico valido')
-            return false;
-        }
-        else if(name===''){
-            setToast(true)
-            setToastMessage('Debe ingresar su nombre')
-            return false;
-        }
-        else if(lastName===''){
-            setToast(true)
-            setToastMessage('Debe ingresar su apellido')
-            return false;
-        }
-        else if(gender===''){
-            setToast(true)
-            setToastMessage('Debe ingresar su genero')
-            return false;
-        }
-        else if(countrie===''){
-            setToast(true)
-            setToastMessage('Debe elegir su pais de residencia')
-            return false;
-        }
-        else if(state===''){
-            setToast(true)
-            setToastMessage('Debe elegir su estado de residencia')
-            return false;
-        }
-        else if(city===''){
-            setToast(true)
-            setToastMessage('Debe elegir su ciudad de residencia')
-            return false;
-        }
-        else if(academicLevel===''){
-            setToast(true)
-            setToastMessage('Debe elegir su nivel Academico')
-            return false;
-        }
+        console.log(checkedGeneralKnowledges)
+        let validation = validator.validate({
+            email,
+            name,
+            lastName,
+            gender,
+            birthDay,
+            countrie,
+            state,
+            city,
+            academicLevel,
+            years,
+            salary
+        });
+        
+        setEmailError(validation.email.message)
+        setNameError(validation.name.message)
+        setLastNameError(validation.lastName.message)
+        setGenderError(validation.gender.message)
+        setBirthDayError(validation.birthDay.message)
+        setCountrieError(validation.countrie.message)
+        setStateError(validation.state.message)
+        setCityError(validation.city.message)
+        setAcademicLevelError(validation.academicLevel.message)
+        setYearsError(validation.years.message)
+        setSalaryError(validation.salary.message)
+
+        let valid=true;
         if(academicLevel==='Tecnico' || academicLevel==='Universitario'){ 
             if(university===''){
-                setToast(true)
-                setToastMessage('Debe ingresar la universidad donde obtuvo su titulo')
-                return false;
+                setUniversityError('Debe ingresar la universidad donde obtuvo su titulo')
+                valid=false 
             }
-            else if(title===''){
-                setToast(true)
-                setToastMessage('Debe ingresar el titulo que posee')
-                return false;
+            else setUniversityError('')
+            if(title===''){
+                setTitleError('Debe ingresar el titulo que posee')
+                valid=false 
             }
+            else setTitleError('')       
         }
+
         if(academicLevel==='Universitario' && specializationLevel===''){
-            setToast(true)
-            setToastMessage('Debe ingresar si posee alguna especializacion')
-            return false;
+            setSpecializationLevelError('Debe ingresar si posee alguna especializacion')
+            valid=false 
         }
+        else setSpecializationLevelError('')
+        
         if(academicLevel==='Universitario' && specializationLevel!=='Ninguna'){
-            if(specializationUniversity==='')
-            {   setToast(true)
-                setToastMessage('Debe ingresar la universidad donde obtuvo su titulo de especializacion')
-                return false;
+            if(specializationUniversity===''){   
+                setSpecializationUniversityError('Debe ingresar la universidad donde obtuvo su titulo de especializacion')
+                valid=false 
             }
-            if(specializationTitle==='')
-            {
-                setToast(true)
-                setToastMessage('Debe ingresar el titulo de especializacion que posee')
-                return false;
+            else setSpecializationUniversityError('')
+            if(specializationTitle===''){
+                setSpecializationTitleError('Debe ingresar el titulo de especializacion que posee')
+                valid=false 
             }
-        }
-        if(years===''){
-            setToast(true)
-            setToastMessage('Debe elegir su tiempo de experiencia laboral')
-            return false;
+            else setSpecializationTitleError('')
         }
         if(years!=='Sin experiencia' && years!=='Menos de 1' && company===''){
-            setToast(true)
-            setToastMessage('Debe indicar la empresa en la que trabajo mas tiempo')
-            return false;
+            setCompanyError('Debe indicar la empresa en la que trabajo mas tiempo')
+            valid=false 
         }
+        else setCompanyError('')
         if(years!=='Sin experiencia' && years!=='Menos de 1' && job===''){
-            setToast(true)
-            setToastMessage('Debe indicar el cargo que desempeño')
-            return false;
+            setJobError('Debe indicar el cargo que desempeño')
+            valid=false 
         }
-        if(salary===''){
-            setToast(true)
-            setToastMessage('Debe indicar el salario al que aspira')
-            return false;
+        else setJobError('')
+        if(validation.isValid && valid)
+        {
+            console.log("valido")
+            
+            let academicFormacion={
+                "academicLevel": academicLevel
+            }
+
+            if(university!=='')
+                academicFormacion.university=university
+            if(title!=='')
+                academicFormacion.title=title
+            if(specializationLevel!=='')
+                academicFormacion.specializationLevel=specializationLevel
+            if(specializationUniversity!=='')
+                academicFormacion.specializationUniversity=specializationUniversity
+            if(specializationTitle!=='')
+                academicFormacion.specializationTitle=specializationTitle
+            
+            let workExperience={
+                "years":years
+            }
+            if(company!=='')
+                workExperience.company=company
+            if(job!=='')
+                workExperience.job=job
+
+            let countrieAux=data.find(countries=> countries.id===countrie)                
+            let stateAux=newStates.find(states=> states.id===state)
+
+            let curriculum={
+                "personalData":{
+                    "email":email,
+                    "name":name,
+                    "lastName":lastName,
+                    "gender":gender,
+                    "birthDay":birthDay,
+                    "countrie":countrieAux.name,
+                    "state":stateAux.name,
+                    "city":city
+                },
+                "workExperience":workExperience,
+                "academicFormacion":academicFormacion,
+                "tecnicalKnowledges":checkedTecnicalKnowledges,
+                "generalKnowledges":checkedGeneralKnowledges,
+                "salary":salary
+            }
+            console.log("curriculum", JSON.stringify(curriculum))
         }
-       
+
     }
+
     return (
         <div className={classes.container}>
             <Toast message={toastMessage} open={toast} close={()=>{setToast(false);}}/>
             <CssBaseline />
-            <Grid lg={12} className={classes.header}>
+            <Grid item lg={12} className={classes.header}>
                 <h2 className={classes.title}>Curriculum Vitae</h2>
             </Grid>
             <Container maxWidth="lg" className={classes.containerChild} >
-                <Grid lg={3} direction='column' className={classes.grid}>
+                <Grid item lg={3}  className={classes.grid}>
                     <h2 className={classes.title}>Datos Personales</h2>
                     <TextField
                         variant="outlined"
@@ -231,9 +345,8 @@ export default function FormScreen() {
                         required
                         fullWidth
                         id="email"
-                        onBlur={handleOnBlurEmail}
-                        error={validEmail}
-                        helperText={validEmail ? 'Please enter a valid Email' : ' '}
+                        helperText={emailError}
+                        error={emailError!==""}
                         label="Email"
                         name="email"
                         autoComplete="email"
@@ -250,6 +363,8 @@ export default function FormScreen() {
                         label="Nombre"
                         name="name"
                         autoComplete="name"
+                        helperText={nameError}
+                        error={nameError!==""}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                     />
@@ -258,16 +373,18 @@ export default function FormScreen() {
                         margin="normal"
                         required
                         fullWidth
-                        id="lastname"
+                        id="lastName"
                         label="Apellido"
-                        name="lastname"
-                        autoComplete="lastname"
+                        name="lastName"
+                        helperText={lastNameError}
+                        error={lastNameError!==""}
+                        autoComplete="lastName"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                     />
-                    <FormControl variant="outlined" margin="normal" fullWidth>
+                    <FormControl variant="outlined" margin="normal" fullWidth >
                         <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
-                            Gender
+                            Genero
                         </InputLabel>
                         <Select
                             labelId="demo-simple-select-outlined-label"
@@ -276,10 +393,11 @@ export default function FormScreen() {
                             onChange={e => setGender(e.target.value)}
                             labelWidth={labelWidth}
                             fullWidth
-
+                            helperText={genderError}
+                            error={genderError!==""}
                         >
                             {
-                                genders.map(gender => (<MenuItem key={gender.name} value={gender.name}>{gender.name}</MenuItem>))
+                                genders.map(gender => (<MenuItem key={gender.id} value={gender.name}>{gender.name}</MenuItem>))
                             }
                         </Select>
                     </FormControl>
@@ -287,30 +405,34 @@ export default function FormScreen() {
                         id="date"
                         label="Fecha de nacimiento"
                         type="date"
-                        defaultValue="2020-02-20"
                         InputLabelProps={{
                             shrink: true,
                         }}
+                        value={birthDay}
+                        helperText={birthDayError}
+                        error={birthDayError!==""}
                         variant="outlined"
                         margin="normal"
                         required
                         fullWidth
                         name="date"
-                        onChange={(e) => setDate(e.target.value)}
+                        onChange={(e) => setBirthDay(e.target.value+"")}
                     />
                     <FormControl variant="outlined" margin="normal" fullWidth>
                         <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
                             Pais de residencia
                         </InputLabel>
                         <Select
-                            value={countrie.name}
+                            value={countrie}
                             onChange={handleCountrieChnage}
                             labelWidth={labelWidth}
                             fullWidth
+                            helperText={countrieError}
+                            error={countrieError!==""}
                         
                         >
                             {
-                                data.map(countries => (<MenuItem id={countries.id} value={countries.id}>{countries.name}</MenuItem>))
+                                data.map(countries => (<MenuItem key={countries.id} name={countries.id} value={countries.id}>{countries.name}</MenuItem>))
                             }
                         </Select>
                     </FormControl>
@@ -325,9 +447,11 @@ export default function FormScreen() {
                                 onChange={handleStateChnage}
                                 labelWidth={labelWidth}
                                 fullWidth
+                                helperText={stateError}
+                                error={stateError!==""}
                             >
                             {
-                                newStates.map(item => (<MenuItem id={item.id} value={item.id}>
+                                newStates.map(item => (<MenuItem key={item.id} name={item.id} value={item.id}>
                                 {
                                     item.name
                                 }
@@ -348,9 +472,11 @@ export default function FormScreen() {
                                 onChange={e => setCity(e.target.value)}
                                 labelWidth={labelWidth}
                                 fullWidth
+                                helperText={cityError}
+                                error={cityError!==""}
                             >
                             {
-                                newCities.map(item => (<MenuItem key={item.name} value={item.name}>
+                                newCities.map(item => (<MenuItem key={item.id} id={item.id}value={item.name}>
                                 {
                                         item.name
                                 }
@@ -361,7 +487,7 @@ export default function FormScreen() {
                         :null
                     }
                 </Grid>
-                <Grid lg={3} direction='column' className={classes.grid}>
+                <Grid item lg={3}  className={classes.grid}>
                     <h2 className={classes.title}>Formación Academica</h2>
                     <FormControl variant="outlined" margin="normal" fullWidth>
                         <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
@@ -374,9 +500,11 @@ export default function FormScreen() {
                             onChange={e => setAcademicLevel(e.target.value)}
                             labelWidth={labelWidth}
                             fullWidth
+                            helperText={academicLevelError}
+                            error={academicLevelError!==""}
                         >
                             {
-                                academicLevels.map(level => (<MenuItem key={level.name} value={level.name}>{level.name}</MenuItem>))
+                                academicLevels.map(level => (<MenuItem key={level.id} value={level.name}>{level.name}</MenuItem>))
                             }
                         </Select>
                     </FormControl>
@@ -392,6 +520,8 @@ export default function FormScreen() {
                                 name="University"
                                 autoComplete="University"
                                 value={university}
+                                helperText={universityError}
+                                error={universityError!==""}
                                 onChange={(e) => setUniversity(e.target.value)}
                             /> : null
                     }
@@ -407,6 +537,8 @@ export default function FormScreen() {
                                 name="title"
                                 autoComplete="title"
                                 value={title}
+                                helperText={titleError}
+                                error={titleError!==""}
                                 onChange={(e) => setTitle(e.target.value)}
                             /> : null
                     }
@@ -423,9 +555,11 @@ export default function FormScreen() {
                                     onChange={e => setSpecializationLevel(e.target.value)}
                                     labelWidth={labelWidth}
                                     fullWidth
+                                    helperText={specializationLevelError}
+                                    error={specializationLevelError!==""}
                                 >
                                     {
-                                        specializations.map(level => (<MenuItem key={level.name} value={level.name}>{level.name}</MenuItem>))
+                                        specializations.map(level => (<MenuItem key={level.id} value={level.name}>{level.name}</MenuItem>))
                                     }
                                 </Select>
                             </FormControl> : null
@@ -442,6 +576,8 @@ export default function FormScreen() {
                                 name="nameUniversity"
                                 autoComplete="nameUniversity"
                                 value={specializationUniversity}
+                                helperText={specializationUniversityError}
+                                error={specializationUniversityError!==""}
                                 onChange={(e) => setSpecializationUniversity(e.target.value)}
                             /> : null
                     }
@@ -457,6 +593,8 @@ export default function FormScreen() {
                                 name="specializationTitle"
                                 autoComplete="specializationTitle"
                                 value={specializationTitle}
+                                helperText={specializationTitleError}
+                                error={specializationTitleError!==""}
                                 onChange={(e) => setSpecializationTitle(e.target.value)}
                             /> : null
                     }
@@ -474,9 +612,11 @@ export default function FormScreen() {
                             onChange={e => setYears(e.target.value)}
                             labelWidth={labelWidth}
                             fullWidth
+                            helperText={yearsError}
+                            error={yearsError!==""}
                         >
                             {
-                                expYears.map(year => (<MenuItem value={year.name}>{year.name}</MenuItem>))
+                                expYears.map(year => (<MenuItem key={year.id} value={year.name}>{year.name}</MenuItem>))
                             }
                         </Select>
                     </FormControl>
@@ -492,6 +632,8 @@ export default function FormScreen() {
                                 name="company"
                                 autoComplete="company"
                                 value={company}
+                                helperText={companyError}
+                                error={companyError!==""}
                                 onChange={(e) => setCompany(e.target.value)}
                             />
                             : null
@@ -508,12 +650,14 @@ export default function FormScreen() {
                                 name="job"
                                 autoComplete="job"
                                 value={job}
+                                helperText={jobError}
+                                error={jobError!==""}
                                 onChange={(e) => setJob(e.target.value)}
                             />
                             : null
                     }
                 </Grid>
-                <Grid lg={3} direction='row' className={classes.grid}>
+                <Grid item lg={3}  className={classes.grid}>
                     <h2 className={classes.title}>Conocimientos tecnicos</h2>
                     {
                         knowledges.technical.map(knowledge => (
@@ -524,7 +668,7 @@ export default function FormScreen() {
                                         name={knowledge.name}
                                         checked={checkedTecnicalKnowledges[knowledge.name]}
                                        // onChange={handleChangeTecnicalKnowledges}
-                                        value={knowledge.name}
+                                        value={knowledge.name || ""}
                                         color="primary"
                                     />
                                 }
@@ -544,7 +688,7 @@ export default function FormScreen() {
                                         name={knowledge.name}
                                         checked={checkedTecnicalKnowledges[knowledge.name]}
                                         onChange={handleChangeGeneralKnowledges}
-                                        value={knowledge.name}
+                                        value={knowledge.name || ""}
                                         color="primary"
                                     />
                                 }
@@ -554,7 +698,7 @@ export default function FormScreen() {
                         ))
                     }
                 </Grid>
-                <Grid lg={3} direction='column' className={classes.grid}>
+                <Grid item lg={3}  className={classes.grid}>
                     <h2 className={classes.title}>Salario</h2>
                     <TextField
                         variant="outlined"
@@ -568,13 +712,15 @@ export default function FormScreen() {
                         autoFocus
                         value={salary}
                         onChange={(e) => setSalary(e.target.value)}
+                        helperText={salaryError}
+                        error={salaryError!==""}
                     />
                 </Grid>
             </Container>
-            <Grid lg={8} direction='column' className={classes.grid}>
+            <Grid item lg={8}  className={classes.grid}>
                 <ButtonSpinner 
                     fullWidth
-                    action={validate}
+                    action={sendData}
                     loading={loading}
                     text="Enviar Curriculum"
                 />
@@ -589,7 +735,8 @@ const useStyles = makeStyles({
         backgroundColor:'powderblue',
         display:'flex',
         alignItems:'center',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        height:1000+'px'
     },
     containerChild: {
         flexDirection: "row",
