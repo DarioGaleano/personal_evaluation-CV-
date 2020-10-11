@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, } from 'react'
 import {
     Grid, Container,
     makeStyles, CssBaseline,
-    TextField, Select,
+    TextField, 
     FormControl, MenuItem,
-    InputLabel, FormControlLabel,
+    FormControlLabel,
     Checkbox
 } from '@material-ui/core'
 import countries from '../helpers/countries.json'
@@ -14,6 +14,8 @@ import knowledges from '../helpers/knowledge.json'
 import Toast from '../components/Toast'
 import ButtonSpinner from '../components/ButtonSpinner'
 import FormValidator from '../helpers/form-validator'
+import { filterNumber, } from '../helpers/filterValues'
+
 const genders = [
     { name: "Masculino", id:1 },
     { name: "Femenino", id:2 },
@@ -42,95 +44,96 @@ const expYears = [
     { name: "10+",id:8 }
 ]
 
+const validator = new FormValidator([
+    {
+        field: "minAge",
+        method: "isEmpty",
+        validWhen: false,
+        message: "Debe ingresar un minimo para la edad"
+    },
+    { 
+        field: 'minAge', 
+        method: 'isNumeric', 
+        validWhen: true, 
+        message: 'Debe ingresar solo numeros' 
+    },
+    {
+      field: "maxAge",
+      method: "isEmpty",
+      validWhen: false,
+      message: "Debe ingresar un maximo para la edad"
+    },
+    {
+      field: "maxAge",
+      method: "isNumeric",
+      validWhen: true,
+      message: "Debe ingresar solo numeros"
+    },
+    {
+        field: "gender",
+        method: "isEmpty",
+        validWhen: false,
+        message: "Debe seleccionar un genero"
+    },
+    {
+        field: "countrie",
+        method: "isEmpty",
+        validWhen: false,
+        message: "Seleccione pais de nacimiento"
+    },
+    {
+        field: "state",
+        method: "isEmpty",
+        validWhen: false,
+        message: "Seleccione tipo de documento"
+    },
+    {
+        field: "city",
+        method: "isEmpty",
+        validWhen: false,
+        message: "Ingrese numero de documento"
+    },
+    {
+        field: "academicLevel",
+        method: "isEmpty",
+        validWhen: false,
+        message: "Seleccione nivel academico"
+    },
+    {
+        field: "years",
+        method: "isEmpty",
+        validWhen: false,
+        message: "Seleccione años de experiencia"
+    },
+    {
+        field: "salaryMin",
+        method: "isEmpty",
+        validWhen: false,
+        message: "Debe ingresar un monto minimo"
+    },
+    {
+        field: "salaryMin",
+        method: "isNumeric",
+        validWhen: true,
+        message: "Debe ingresar un monto"
+    },
+    {
+        field: "salaryMax",
+        method: "isEmpty",
+        validWhen: false,
+        message: "Debe ingresar un monto maximo"
+    },
+    {
+        field: "salaryMax",
+        method: "isNumeric",
+        validWhen: true,
+        message: "Debe ingresar un monto"
+    }
+  ]);
 
 export default function RequestScreen() {
 
-    const validator = new FormValidator([
-        {
-            field: "minAge",
-            method: "isEmpty",
-            validWhen: false,
-            message: "Debe un minimo para la edad"
-        },
-        { 
-            field: 'minAge', 
-            method: 'isNumeric', 
-            validWhen: true, 
-            message: 'Debe ingresar solo numeros' 
-        },
-        {
-          field: "maxAge",
-          method: "isEmpty",
-          validWhen: false,
-          message: "Debe ingresar un maximo para la edad"
-        },
-        {
-          field: "maxAge",
-          method: "isNumeric",
-          validWhen: true,
-          message: "Debe ingresar solo numeros"
-        },
-        {
-            field: "gender",
-            method: "isEmpty",
-            validWhen: false,
-            message: "Debe seleccionar un genero"
-        },
-        {
-            field: "countrie",
-            method: "isEmpty",
-            validWhen: false,
-            message: "Seleccione pais de nacimiento"
-        },
-        {
-            field: "state",
-            method: "isEmpty",
-            validWhen: false,
-            message: "Seleccione tipo de documento"
-        },
-        {
-            field: "city",
-            method: "isEmpty",
-            validWhen: false,
-            message: "Ingrese numero de documento"
-        },
-        {
-            field: "academicLevel",
-            method: "isEmpty",
-            validWhen: false,
-            message: "Seleccione pais del documento"
-        },
-        {
-            field: "years",
-            method: "isEmpty",
-            validWhen: false,
-            message: "Seleccione pais del documento"
-        },
-        {
-            field: "salaryMin",
-            method: "isEmpty",
-            validWhen: false,
-            message: "Debe ingresar un monto minimo"
-        },
-        {
-            field: "salaryMin",
-            method: "isNumeric",
-            validWhen: true,
-            message: "Debe ingresar un monto"
-        },
-        {
-            field: "salaryMax",
-            method: "isEmpty",
-            validWhen: false,
-            message: "Debe ingresar un monto maximo"
-        },
-        {
-            field: "salaryMax",
-            method: "isNumeric",
-            validWhen: true,
-            message: "Debe ingresar un monto"
-        }
-      ]);
+
 
     const classes = useStyles();
     const [minAge, setMinAge] = useState('')
@@ -158,7 +161,6 @@ export default function RequestScreen() {
 
     const [newCities, setNewCities] = useState([])
     const [newStates, setNewtates] = useState([])
-    const [labelWidth, setLabelWidth] = useState(0);
    
     const [checkedTecnicalKnowledges, setTecnicalKnowledges] = useState([])
     const [checkedGeneralKnowledges, setGeneralKnowledges] = useState([])
@@ -206,10 +208,7 @@ export default function RequestScreen() {
         await setNewCities(aux)
     }
     const data = countries.countries;
-    const inputLabel = useRef(null);
-    useEffect(() => {
-        setLabelWidth(inputLabel.current.offsetWidth);
-    }, []);
+
 
     const onSubmit=async ()=>{
         let validation = validator.validate({
@@ -258,7 +257,7 @@ export default function RequestScreen() {
                 "generalKnowledges":checkedGeneralKnowledges,
             }
             
-            console.log("request", JSON.stringify(request))
+            console.log("request", request)
 
         }
         setLoading(false)
@@ -286,7 +285,8 @@ export default function RequestScreen() {
                         name="minAge"
                         autoComplete="minAge"
                         value={minAge}
-                        onChange={(e) => setMinAge(e.target.value)}
+                        onBlur={()=>setMinAgeError(minAge!==''?'':'Debe ingresar un minimo para la edad')}
+                        onChange={(e) => setMinAge(filterNumber(e.target.value))}
                     />
                     <TextField
                         variant="outlined"
@@ -301,139 +301,116 @@ export default function RequestScreen() {
                         name="maxAge"
                         autoComplete="maxAge"
                         value={maxAge}
-                        onChange={(e) => setMaxAge(e.target.value)}
+                        onBlur={() => setMaxAgeError(maxAge!==''?'':'Debe ingresar un maximo para la edad')}
+                        onChange={(e) => setMaxAge(filterNumber(e.target.value))}
                     />
-                    <FormControl variant="outlined" margin="normal" fullWidth>
-                        <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
-                            Genero
-                    </InputLabel>
-                        <Select
-                            labelId="demo-simple-select-outlined-label"
+                    <TextField variant="outlined" select fullWidth style={{margin:"16px 0 8px"}}
                             id="demo-simple-select-outlined"
-                            value={gender}
                             onChange={e => setGender(e.target.value)}
-                            labelWidth={labelWidth}
-                            fullWidth
                             helperText={genderError}
                             error={genderError!==""}
+                            //value={gender}
+                            defaultValue="none"
+                            onBlur={() => setGenderError(gender!==''?'':'Debe seleccionar un genero')}
                         >
-                            {
-                                genders.map(gender => (<MenuItem key={gender.name} value={gender.name}>{gender.name}</MenuItem>))
-                            }
-                        </Select>
-                    </FormControl>
+                            <MenuItem value="none" disabled>
+                                <em>Genero</em>
+                            </MenuItem>
+                    {
+                        
+                        genders.map(gender => (<MenuItem key={gender.id} value={gender.name}>{gender.name}</MenuItem>))
+                    }
+                    </TextField>
                     
-                    <FormControl variant="outlined" margin="normal" fullWidth>
-                        <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
-                            Pais de residencia
-                        </InputLabel>
-                        <Select
-                            value={countrie}
+                    <TextField variant="outlined" select fullWidth style={{margin:"16px 0 8px"}}
+                            id="demo-simple-select-outlined"
                             onChange={handleCountrieChnage}
-                            labelWidth={labelWidth}
-                            fullWidth
                             helperText={countrieError}
                             error={countrieError!==""}
+                            defaultValue="none"
+                            onBlur={() => setCountrieError(countrie!==''?'':'Debe seleccionar un pais')}
                         >
-                            {
-                                data.map(countries => (<MenuItem key ={countries.id} value={countries.id}>{countries.name}</MenuItem>))
-                            }
-                        </Select>
-                    </FormControl>
+                            <MenuItem value="none" disabled>
+                                <em>Pais de residencia</em>
+                            </MenuItem>
+                        {
+                                data.map(countries => (<MenuItem key={countries.id} name={countries.id} value={countries.id}>{countries.name}</MenuItem>))
+                        }
+                    </TextField>
                     {
                         countrie!==''?
-                        <FormControl variant="outlined" margin="normal" fullWidth>
-                            <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
-                                Estado
-                            </InputLabel>
-                            <Select
-                                value={state}
+                        <TextField variant="outlined" select fullWidth style={{margin:"16px 0 8px"}}
+                                id="demo-simple-select-outlined"
                                 onChange={handleStateChnage}
-                                labelWidth={labelWidth}
-                                fullWidth
                                 helperText={stateError}
                                 error={stateError!==""}
+                                defaultValue="none"
+                                onBlur={() => setStateError(state!==''?'':'Debe seleccionar un estado')}
                             >
+                                <MenuItem value="none" disabled>
+                                    <em>Estado</em>
+                                </MenuItem>
                             {
-                                newStates.map(item => (<MenuItem key={item.id} value={item.id}>
-                                {
-                                    item.name
-                                }
-                                </MenuItem>))
+                                newStates.map(item => (<MenuItem key={item.id} name={item.id} value={item.id}>{item.name}</MenuItem>))
                             }
-                            </Select>
-                        </FormControl>
+                        </TextField>
                         :null
                     }
                     {
                         state!==''?
-                        <FormControl variant="outlined" margin="normal" fullWidth>
-                            <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
-                                Ciudad
-                            </InputLabel>
-                            <Select
-                                value={city}
+                        <TextField variant="outlined" select fullWidth style={{margin:"16px 0 8px"}}
+                                id="demo-simple-select-outlined"
                                 onChange={e => setCity(e.target.value)}
-                                labelWidth={labelWidth}
-                                fullWidth
                                 helperText={cityError}
                                 error={cityError!==""}
+                                defaultValue="none"
+                                onBlur={() => setCityError(city!==''?'':'Debe seleccionar una ciudad')}
                             >
+                                <MenuItem value="none" disabled>
+                                    <em>Ciudad</em>
+                                </MenuItem>
                             {
-                                newCities.map(item => (<MenuItem key={item.id} value={item.name}>
-                                {
-                                        item.name
-                                }
-                                </MenuItem>))
+                                newCities.map(item => (<MenuItem key={item.id} id={item.id}value={item.name}>{item.name}</MenuItem>))
                             }
-                            </Select>
-                        </FormControl>
+                        </TextField>
                         :null
                     }
                 </Grid>
                 <Grid item lg={3} className={classes.grid}>
                     <h2 className={classes.title}>Formación Academica</h2>
-                    <FormControl variant="outlined" margin="normal" fullWidth>
-                        <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
-                            Nivel Academico
-                    </InputLabel>
-                        <Select
-                            labelId="demo-simple-select-outlined-label"
+                    <TextField variant="outlined" select fullWidth style={{margin:"16px 0 8px"}}
                             id="demo-simple-select-outlined"
-                            value={academicLevel}
                             onChange={e => setAcademicLevel(e.target.value)}
-                            labelWidth={labelWidth}
-                            fullWidth
                             helperText={academicLevelError}
                             error={academicLevelError!==""}
+                            defaultValue="none"
+                            onBlur={() => setAcademicLevelError(academicLevel!==''?'':'Seleccione su nivel academico')}
                         >
-                            {
-                                academicLevels.map(level => (<MenuItem key={level.id} value={level.name}>{level.name}</MenuItem>))
-                            }
-                        </Select>
-                    </FormControl>
+                            <MenuItem value="none" disabled>
+                                <em>Nivel Academico</em>
+                            </MenuItem>
+                        {
+                            academicLevels.map(level => (<MenuItem key={level.id} value={level.name}>{level.name}</MenuItem>))
+                        }
+                    </TextField>
                     <FormControl variant="outlined" margin="normal" fullWidth className={classes.formTitle}>
                         <h2 className={classes.title}>Experiencia Laboral</h2>
                     </FormControl>
-                    <FormControl variant="outlined" margin="normal" fullWidth>
-                        <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
-                            Años de experiencia
-                        </InputLabel>
-                        <Select
-                            labelId="demo-simple-select-outlined-label"
+                    <TextField variant="outlined" select fullWidth style={{margin:"16px 0 8px"}}
                             id="demo-simple-select-outlined"
-                            value={years}
                             onChange={e => setYears(e.target.value)}
-                            labelWidth={labelWidth}
-                            fullWidth
                             helperText={yearsError}
                             error={yearsError!==""}
+                            defaultValue="none"
+                            onBlur={() => setYearsError(years!==''?'':'Seleccione años de experiencia')}
                         >
-                            {
-                                expYears.map(year => (<MenuItem key={year.id} value={year.name}>{year.name}</MenuItem>))
-                            }
-                        </Select>
-                    </FormControl>
+                            <MenuItem value="none" disabled>
+                                <em>Años de experiencia</em>
+                            </MenuItem>
+                        {
+                            expYears.map(year => (<MenuItem key={year.id} value={year.name}>{year.name}</MenuItem>))
+                        }
+                    </TextField>
                 </Grid>
                 <Grid item lg={3}  className={classes.grid}>
                     <h2 className={classes.title}>Conocimientos tecnicos</h2>
@@ -492,7 +469,8 @@ export default function RequestScreen() {
                         inputProps={{maxLength: 5}}
                         autoFocus
                         value={salaryMin}
-                        onChange={(e) => setSalaryMin(e.target.value)}
+                        onBlur={()=> setSalaryMinError(salaryMin!==''?'':'Debe ingresar un monto minimo')}
+                        onChange={(e) => setSalaryMin(filterNumber(e.target.value))}
                     />
                     <TextField
                         variant="outlined"
@@ -508,7 +486,8 @@ export default function RequestScreen() {
                         inputProps={{maxLength: 5}}
                         autoFocus
                         value={salaryMax}
-                        onChange={(e) => setSalaryMax(e.target.value)}
+                        onBlur={()=>setSalaryMaxError(salaryMax!==''?'':'Debe ingresar un monto maximo')}
+                        onChange={(e) => setSalaryMax(filterNumber(e.target.value))}
                     />
                 </Grid>
             </Container>
@@ -531,7 +510,7 @@ const useStyles = makeStyles({
         display:'flex',
         alignItems:'center',
         flexDirection: 'column',
-        height:1000+'px'
+        height:"100vh"
     },
     containerChild: {
         flexDirection: "row",
