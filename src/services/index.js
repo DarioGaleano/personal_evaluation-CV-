@@ -5,7 +5,7 @@ const base ='https://frozen-mesa-63851.herokuapp.com'
 
 
 const workCategories = async () =>{
-    const request = await fetch(`${base}/categories`,{});
+    const request = await fetch(`${base}/data/search/candidates`,{});
     const response = await request.json()
     return{
         status:request.status,
@@ -39,7 +39,7 @@ const candidateRegistration = async ({person, background, work_experience, addre
     }
 }
 
-const searchCandidatePresencial = async ({catg_position_id, experience_years, salary_offer, work_type_available, country, city }) => {
+const searchCandidate = async ({catg_position_id, experience_years, salary_offer, work_type_available, country, city }) => {
     console.log(JSON.stringify({
         catg_position_id, 
         experience_years, 
@@ -69,35 +69,8 @@ const searchCandidatePresencial = async ({catg_position_id, experience_years, sa
     }
 }
 
-const searchCandidateRemote = async ({catg_position_id, experience_years, salary_offer, work_type_available }) => {
-    console.log(JSON.stringify({
-        catg_position_id, 
-        experience_years, 
-        salary_offer, 
-        work_type_available
-    }))
-    const request = await fetch(`${base}/jobs/search`,{
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body:JSON.stringify({
-            catg_position_id, 
-            experience_years, 
-            salary_offer, 
-            work_type_available, 
-        })
-    })
-    const response = await request.json()
-    return {
-        status: request.status,
-        response
-    }
-}
-
 export{
     workCategories,
     candidateRegistration,
-    searchCandidatePresencial,
-    searchCandidateRemote
+    searchCandidate
 }

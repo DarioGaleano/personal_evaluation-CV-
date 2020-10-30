@@ -9,15 +9,10 @@ import {
 import countries from '../helpers/countries.json'
 import states from '../helpers/states.json'
 import cities from '../helpers/cities.json'
-import { ButtonSpinner, Toast, Loader } from '../components/'
+import { ButtonSpinner, Toast, Loader, Modal } from '../components/'
 import FormValidator from '../helpers/form-validator'
 import { filterNumber, } from '../helpers/filterValues'
-import { workCategories, searchCandidatePresencial, searchCandidateRemote } from '../services'
-
-const jobTypes = [
-    { name: "Remoto", id:"1" },
-    { name: "Presencial", id:"2" },
-]
+import { workCategories, searchCandidate } from '../services'
 
 const validatorAddress = new FormValidator([
     {
@@ -79,7 +74,7 @@ export default function RequestScreen() {
     const [salary, setSalary] = useState('')
 
     const [categorie, setCategorie]=useState('')
-    const [jobType, setJobType]=useState('')
+    const [jobType, setJobType]=useState(null)
 
 
     const [countrieError, setCountrieError]=useState('')
@@ -93,20 +88,24 @@ export default function RequestScreen() {
 
     const [newCities, setNewCities] = useState([])
     const [newStates, setNewtates] = useState([])
-    const [categories, setCategories]=useState([])
-
+    const [categories, setCategories] = useState([])
+    const [work_types, setWorkTypes] = useState([])
+    const [candidates, setCandidates]=useState([])
+    const [candidate, setCandidate]= useState(null)
+    const [modal, setModal]=useState(false)
     const [loading,setLoading]=useState(false)
     const [toast,setToast] = useState(false)
     const [toastMessage,setToastMessage] = useState('')
-
    
     useEffect(()=>{
         async function init(){
             const { status, response } = await workCategories();
             if(status===200){
-                let aux=[]
-                response.data.forEach(item => aux.push(item));
-                setCategories(aux);
+                let auxCategories=[], auxWorks=[]
+                response.data.work_categories.forEach(item => auxCategories.push(item));
+                response.data.work_type.forEach(item => auxWorks.push(item))
+                setCategories(auxCategories);
+                setWorkTypes(auxWorks)
             }
         }
         init()
@@ -137,7 +136,6 @@ export default function RequestScreen() {
 
 
     const onSubmit=async ()=>{
-        
         let validation = validator.validate({
             years,
             salary,
@@ -151,7 +149,8 @@ export default function RequestScreen() {
         setJobTypeError(validation.jobType.message)
 
         if(validation.isValid){
-            if(jobType==="1"){
+            console.log(`jobType`, jobType)
+            if(jobType===2){
                 let validationAddress = validatorAddress.validate({
                     countrie,
                     state,
@@ -164,7 +163,15 @@ export default function RequestScreen() {
                     let countrieAux=countries.countries.find(countries => countries.id===countrie)                
                     try{
                         setLoading(true)
-                        const { status, response } = await searchCandidatePresencial({
+                        console.log('peticion', {
+                            catg_position_id:`${categorie}`,
+                            experience_years:years,
+                            salary_offer:salary,
+                            work_type_available:jobType,
+                            country:countrieAux.name,
+                            city:city
+                        })
+                        const { status, response } = await searchCandidate({
                             catg_position_id:`${categorie}`,
                             experience_years:years,
                             salary_offer:salary,
@@ -176,6 +183,7 @@ export default function RequestScreen() {
                         if(status===200){
                             setToast(true)
                             setToastMessage(response.message)
+                            setCandidates(response.data.candidates)
                             console.log('response', response)
                         }
                         else if(status===405){
@@ -190,17 +198,21 @@ export default function RequestScreen() {
             }
             else {
                 try{
+                    console.log('here')
                     setLoading(true)
-                    const { status, response } = await searchCandidateRemote({
+                    const { status, response } = await searchCandidate({
                         catg_position_id:`${categorie}`,
                         experience_years:years,
                         salary_offer:salary,
-                        work_type_available:jobType
+                        work_type_available:jobType,
+                        country:'',
+                        city:''
                     })
                     setLoading(false)
                     if(status===200){
                         setToast(true)
                         setToastMessage(response.message)
+                        setCandidates(response.data.candidates)
                         console.log('response', response)
                     }
                     else if(status===405){
@@ -217,6 +229,7 @@ export default function RequestScreen() {
     }
     return (
         <div className={classes.container}>
+            {modal && <Modal open={modal} close={()=>setModal(!modal)} candidate={candidate}/>}
             <Loader loading={loading} />
             <Toast open={toast} message={toastMessage} close={() => setToast(false)}/>
             <Grid item lg={12} className={classes.header}>
@@ -260,7 +273,7 @@ export default function RequestScreen() {
                     <TextField variant="outlined" select fullWidth style={{margin:"16px 0 8px"}}
                             labelid="demo-simple-select-outlined-label"
                             id="demo-simple-select-outlined"
-                            onChange={e => setJobType(e.target.value)}
+                            onChange={e => {setJobType(e.target.value); setCountrie(''); setCity('')}}
                             helperText={jobTypeError}
                             error={jobTypeError!==""}
                             defaultValue="none"
@@ -270,7 +283,7 @@ export default function RequestScreen() {
                                 <em>Modalidad</em>
                             </MenuItem>
                         {
-                            jobTypes.map(type => (<MenuItem key={type.id} value={type.id}>{type.name}</MenuItem>))
+                            work_types.map(type => (<MenuItem key={type.id} value={type.id}>{type.name}</MenuItem>))
                         }
                     </TextField>
                     <TextField
@@ -290,7 +303,7 @@ export default function RequestScreen() {
                         error={salaryError!==""}
                     />
                     {
-                        jobType!=="1"? null:
+                        jobType!==2? null:
                         <TextField variant="outlined" select fullWidth style={{margin:"16px 0 8px"}}
                                 id="demo-simple-select-outlined"
                                 onChange={handleCountrieChnage}
@@ -356,6 +369,63 @@ export default function RequestScreen() {
                     text="Continuar"
                 />
             </Grid>
+            <Container>
+                <Grid container justify="space-between" style={{marginTop:20}}>
+                    <Grid item sm={2} className={classes.grid}>
+                        <strong>Nombre</strong>
+                    </Grid>
+                    <Grid item sm={2} className={classes.grid}>
+                        <strong>Edad</strong>
+                    </Grid>
+                    <Grid item sm={2} className={classes.grid}>
+                        <strong>Puesto</strong>
+                    </Grid>
+                    <Grid item sm={2} className={classes.grid}>
+                        <strong>Puntuación</strong>
+                    </Grid>
+                    <Grid item sm={2} className={classes.grid}>
+                    
+                    </Grid>
+                </Grid>
+                <Grid container >
+                {
+                    candidates.length!==0 &&
+                    candidates.map((candidate, index) =>(
+                        <Grid item sm={12} key={index}>
+                            <Grid container justify="space-between">
+                                <Grid item sm={2} className={classes.grid}>
+                                    <label>{`${candidate.personal_data.firstname} ${candidate.personal_data.lastname}`}</label>
+                                </Grid>
+                                <Grid item sm={2} className={classes.grid}>
+                                    <label>{candidate.personal_data.age}</label>
+                                </Grid>
+                                <Grid item sm={2} className={classes.grid}>
+                                    <label>{candidate.personal_data.work_exp_catg}</label>
+                                </Grid>
+                                <Grid item sm={2} className={classes.grid}>
+                                    <label>{candidate.percentage}</label>
+                                </Grid>
+                                <Grid item sm={2}>
+                                    <ButtonSpinner 
+                                        
+                                        action={()=>{
+                                            setModal(!modal)
+                                            setCandidate(candidate)
+                                        }}
+                                        loading={loading}
+                                        text="Ver más"
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    
+                    ))
+                }
+                </Grid>
+            
+            
+            </Container>
+            
         </div>
     )
 }
@@ -367,7 +437,9 @@ const useStyles = makeStyles({
         display:'flex',
         alignItems:'center',
         flexDirection: 'column',
-        height:"100vh"
+        minHeight:"100vh",
+        backgroundSize:"cover",
+        padding:"10px"
     },
     containerChild: {
         flexDirection: "row",
@@ -388,7 +460,7 @@ const useStyles = makeStyles({
         margin: 0
     },
     grid: {
-        margin: 10 + 'px'
+        padding:"10px"
     },
     formTitle: {
         height: 56 + 'px',

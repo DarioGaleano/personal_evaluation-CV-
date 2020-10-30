@@ -13,6 +13,7 @@ import { ButtonSpinner, Toast, Loader} from '../components'
 import FormValidator from '../helpers/form-validator'
 import { filterAlpha, filterNumber, onBlurEmail } from '../helpers/filterValues'
 import { workCategories, candidateRegistration } from '../services'
+
 const genders = [
     { name: "Masculino", id:1 },
     { name: "Femenino", id:2 }
@@ -21,10 +22,6 @@ const academicLevels = [
     { name: "Bachiller", id:1 },
     { name: "Tecnico", id:2 },
     { name: "Universitario", id:3 }
-]
-const jobTypes = [
-    { name: "Remoto", id:"1" },
-    { name: "Presencial", id:"2" },
 ]
 
 const validator = new FormValidator([
@@ -182,6 +179,8 @@ export default function FormScreen() {
 
     const [worksExperience, setWorksExperience]=useState([])
     const [categories, setCategories]=useState([])
+    const [work_types, setWorkTypes] = useState([])
+
 
     const [emailError, setEmailError]=useState('')
     const [nameError, setNameError]=useState('')
@@ -207,9 +206,11 @@ export default function FormScreen() {
         async function init(){
             const { status, response } = await workCategories();
             if(status===200){
-                let aux=[]
-                response.data.forEach(item => aux.push(item));
-                setCategories(aux);
+                let auxCategories=[], auxWorks=[]
+                response.data.work_categories.forEach(item => auxCategories.push(item));
+                response.data.work_type.forEach(item => auxWorks.push(item))
+                setCategories(auxCategories);
+                setWorkTypes(auxWorks)
             }
         }
         init()
@@ -286,7 +287,7 @@ export default function FormScreen() {
                         "born_date": birthDay,
                         "work_exp_catg": `${categorie}`,
                         "salary_expectation": salary,
-                        "work_types_available": jobType
+                        "work_type_available": `${jobType}`
                     },
                     background:[
                         {
@@ -569,7 +570,7 @@ export default function FormScreen() {
                                 <em>Modalidad</em>
                             </MenuItem>
                         {
-                            jobTypes.map(type => (<MenuItem key={type.id} value={type.id}>{type.name}</MenuItem>))
+                            work_types.map(type => (<MenuItem key={type.id} value={type.id}>{type.name}</MenuItem>))
                         }
                         </TextField>
                         <h2 className={classes.title}>Salario</h2>
@@ -662,7 +663,7 @@ export default function FormScreen() {
                                     required
                                     fullWidth
                                     id="time"
-                                    label="Tiempo"
+                                    label="Tiempo (Años)"
                                     name="time"
                                     autoComplete="time"
                                     
@@ -684,16 +685,16 @@ export default function FormScreen() {
                         </Grid>
                         <Grid container>
                             <Grid item sm={3} className={classes.grid}>
-                                <label>Fecha de inicio</label>
+                                <strong>Fecha de inicio</strong>
                             </Grid>
                             <Grid item sm={3} className={classes.grid}>
-                                <label>Fecha de finalización</label>
+                                <strong>Fecha de finalización</strong>
                             </Grid>
                             <Grid item sm={3} className={classes.grid}>
-                                <label>Puesto</label>
+                                <strong>Puesto</strong>
                             </Grid>
                             <Grid item sm={3} className={classes.grid}>
-                                <label>Tiempo</label>
+                                <strong>Tiempo</strong>
                             </Grid>
                         </Grid>
                         <Grid container>
